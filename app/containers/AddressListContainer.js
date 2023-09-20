@@ -42,6 +42,7 @@ import Metrics from "../utils/metrics";
 import { getCurrentLocation } from "../utils/LocationServiceManager";
 import Geocoder from "react-native-geocoding";
 import Geolocation from "@react-native-community/geolocation";
+import axios from "axios";
 
 class AddressListContainer extends React.PureComponent {
   constructor(props) {
@@ -71,6 +72,7 @@ class AddressListContainer extends React.PureComponent {
 
   componentDidMount() {
     // this.showThePopUpForPresideLocation();
+    this.getCurrentAddressLocation();
   }
 
   //showThePopUpForPresideLocation
@@ -94,7 +96,10 @@ class AddressListContainer extends React.PureComponent {
     Geolocation.getCurrentPosition(
       (position) => {
         console.log("====================================");
-        console.log(position.coords.latitude, position.coords.longitude);
+        console.log(
+          "latLong" + position.coords.latitude,
+          position.coords.longitude
+        );
         console.log("====================================");
         if (position.coords.latitude && position.coords.longitude) {
           this.callThePreciseApi(
@@ -132,12 +137,9 @@ class AddressListContainer extends React.PureComponent {
       formdata.append("latitude", lati);
       formdata.append("longitude", long);
       formdata.append("user_id", this.props.UserID);
+      console.log("abdjkabsdjkasb : ", formdata);
       fetch("https://epicwinesandspirits.africa/v2/Api/getAddress", {
         method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
         body: formdata,
       })
         .then((response) => response.json())
@@ -145,17 +147,14 @@ class AddressListContainer extends React.PureComponent {
           this.setState({
             isLoading: false,
           });
-          if (json?.status == "OK") {
-            // Alert.alert("Epic", "Your precise location is save.", [
-            //   {
-            //     text: "OK",
-            //     onPress: () => {},
-            //   },
-            // ]);
+          if (json?.response?.status == "OK") {
+            console.log("addAddressJson => ", json?.response?.status);
+
             this.fetchAddressList();
           }
         });
     } catch (error) {
+      console.log("error : ", error);
       this.setState({
         isLoading: false,
       });
