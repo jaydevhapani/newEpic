@@ -70,7 +70,7 @@ class AddressListContainer extends React.PureComponent {
   }
 
   componentDidMount() {
-    this.showThePopUpForPresideLocation();
+    // this.showThePopUpForPresideLocation();
   }
 
   //showThePopUpForPresideLocation
@@ -79,7 +79,7 @@ class AddressListContainer extends React.PureComponent {
       {
         text: "OK",
         onPress: () => {
-          this.getCurrentAddressLocation();
+          // this.getCurrentAddressLocation();
           // this.callThePreciseApi();
         },
       },
@@ -131,6 +131,7 @@ class AddressListContainer extends React.PureComponent {
       const formdata = new FormData();
       formdata.append("latitude", lati);
       formdata.append("longitude", long);
+      formdata.append("user_id", this.props.UserID);
       fetch("https://epicwinesandspirits.africa/v2/Api/getAddress", {
         method: "POST",
         headers: {
@@ -145,12 +146,13 @@ class AddressListContainer extends React.PureComponent {
             isLoading: false,
           });
           if (json?.status == "OK") {
-            Alert.alert("Epic", "Your precise location is save.", [
-              {
-                text: "OK",
-                onPress: () => {},
-              },
-            ]);
+            // Alert.alert("Epic", "Your precise location is save.", [
+            //   {
+            //     text: "OK",
+            //     onPress: () => {},
+            //   },
+            // ]);
+            this.fetchAddressList();
           }
         });
     } catch (error) {
@@ -333,7 +335,8 @@ class AddressListContainer extends React.PureComponent {
   //#region NETWORK METHODS
   onConnectionChangeHandler = (isConnected) => {
     if (isConnected) {
-      this.fetchAddressList();
+      // this.fetchAddressList();
+      this.getCurrentAddressLocation();
     }
   };
 
@@ -608,6 +611,7 @@ class AddressListContainer extends React.PureComponent {
 
   onDidFocusEvent = () => {
     this.fetchAddressList();
+    // this.getCurrentAddressLocation();
     // this.props.changeCartButtonVisibility({
     //   shouldShowFloatingButton: false,
     //   currentScreen: this.props,
