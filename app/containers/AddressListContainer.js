@@ -237,8 +237,10 @@ class AddressListContainer extends React.PureComponent {
           </EDRTLView>
 
           {/* ADDRESS LIST */}
+          {console.log("isDeliveryStatus: ", this.state.isDeliveryStatus)}
           {this.arrayAddresses !== undefined &&
-          this.arrayAddresses.length > 0 ? (
+          this.arrayAddresses.length > 0 &&
+          this.state.isDeliveryStatus == 1 ? (
             // <View style={style.parentFlex}>
             //   <FlatList
             //     style={style.flatView}
