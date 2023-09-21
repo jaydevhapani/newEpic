@@ -80,7 +80,7 @@ export const ACCESS_TOKEN = 'ACCESS_TOKEN';
 export const RESPONSE_FAIL = 0;
 export const RESPONSE_SUCCESS = 1;
 export const COUPON_ERROR = 2;
-export const GOOGLE_API_KEY = 'AIzaSyAtOyCW-Bi9xOaoLAvg7RiBmvL6FoAhU1s';
+export const GOOGLE_API_KEY = 'AIzaSyCKIMU__7hjSzRzaKteDeowuxcYEVYGTkY';
 export const STORE_ERROR = 3;
 
 // NOTIFICATION_TYPE

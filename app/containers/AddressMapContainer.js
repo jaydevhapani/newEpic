@@ -214,6 +214,7 @@ class AddressMapContainer extends React.Component {
     if (this.nav_value !== 2) {
       if (this.props.navigation.state.params.address_id !== undefined) {
         this.address_id = this.props.navigation.state.params.address_id;
+        console.log('CheckOne1');
       }
       this.getCurrentAddressLocation();
     } else {
@@ -223,6 +224,7 @@ class AddressMapContainer extends React.Component {
       this.address_id = addressData.addressId;
       this.state.objRegistrationDetails.strAddress1 = addressData.addressLine1;
       this.state.is_main = addressData.is_main;
+      console.log('CheckOne2');
 
       this.setState({
         region: {
@@ -282,7 +284,7 @@ class AddressMapContainer extends React.Component {
         });
       },
       this.onFailureGetAddress,
-      this.props.googleMapsAPIKey,
+      'AIzaSyCKIMU__7hjSzRzaKteDeowuxcYEVYGTkY',
     );
   };
 
@@ -386,7 +388,7 @@ class AddressMapContainer extends React.Component {
         // showDialogue(onFailure.message);
         showDialogue(strings('addressNew.turnOnGps'));
       },
-      'AIzaSyAtOyCW-Bi9xOaoLAvg7RiBmvL6FoAhU1s',
+      'AIzaSyCKIMU__7hjSzRzaKteDeowuxcYEVYGTkY',
     );
   };
   navigateToBack = () => {

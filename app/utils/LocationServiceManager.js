@@ -20,7 +20,7 @@ export function getCurrentLocation(onSucess, onFailure, googleMapsAPIKey) {
     return;
   }
 
-  Geocoder.init(googleMapsAPIKey);
+  Geocoder.init('AIzaSyCKIMU__7hjSzRzaKteDeowuxcYEVYGTkY');
   Geolocation.getCurrentPosition(
     (position) => {
       getAddress(
@@ -35,7 +35,7 @@ export function getCurrentLocation(onSucess, onFailure, googleMapsAPIKey) {
           onSucess(region);
         },
         onFailure,
-        googleMapsAPIKey,
+        'AIzaSyCKIMU__7hjSzRzaKteDeowuxcYEVYGTkY',
       );
     },
     (error) => {
@@ -73,7 +73,7 @@ export function getAddress(
     return;
   }
   debugLog('latitude :: longitude :: ', latitude, longitude);
-  Geocoder.init(googleMapsAPIKey);
+  Geocoder.init('AIzaSyCKIMU__7hjSzRzaKteDeowuxcYEVYGTkY');
   Geocoder.from(latitude, longitude)
     .then((json) => {
       debugLog('JSON ADDRESS ::::::', json);

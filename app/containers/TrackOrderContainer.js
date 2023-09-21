@@ -197,7 +197,7 @@ class TrackOrderContainer extends React.Component {
             this.onSuccessCalculateOrderArrivalTime,
             this.onFailureCalculateOrderArrivalTime,
             this.props,
-            this.props.googleMapsAPIKey,
+            'AIzaSyCKIMU__7hjSzRzaKteDeowuxcYEVYGTkY',
         );
     };
 
