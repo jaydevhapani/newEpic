@@ -331,7 +331,7 @@ class SignUpContainer extends React.PureComponent {
                     { width: 150, height: 46, marginTop: 0 },
                   ]}
                   label={"Verify"}
-                  isLoading={this.state.isLoading}
+                  isLoading={this.state.isOtpLoader}
                   onPress={() => this.verifyTheOtp()}
                   isRadius={true}
                   textStyle={{ fontSize: 16 }}
@@ -349,7 +349,7 @@ class SignUpContainer extends React.PureComponent {
   async verifyTheOtp() {
     try {
       this.setState({
-        isLoading: true,
+        isOtpLoader: true,
       });
       const formdata = new FormData();
       formdata.append("otp", this.state.enterOtp);
@@ -362,10 +362,11 @@ class SignUpContainer extends React.PureComponent {
         .then((response) => response.json())
         .then((json) => {
           this.setState({
-            isLoading: false,
+            isOtpLoader: false,
           });
           console.log("Json : ", json);
           if (json?.status == 1) {
+            this.setState({ isOtpBoxVisible: false });
             showDialogue(json?.message, "", [], this.buttonBackPressed);
           } else {
             showDialogue(json?.message, "Alert");
@@ -374,7 +375,7 @@ class SignUpContainer extends React.PureComponent {
     } catch (error) {
       console.log("error : ", error);
       this.setState({
-        isLoading: false,
+        isOtpLoader: false,
       });
     }
   }
@@ -414,6 +415,7 @@ class SignUpContainer extends React.PureComponent {
     isSignUpObjectDoneMessage: undefined,
     enterOtp: undefined,
     getEntry_userID: undefined,
+    isOtpLoader : false,
   };
   //#endregion
 
