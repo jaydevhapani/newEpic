@@ -1,49 +1,49 @@
-import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {connect} from 'react-redux';
-import {strings} from '../locales/i18n';
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { connect } from "react-redux";
+import { strings } from "../locales/i18n";
 import {
   saveUserDetailsInRedux,
   saveTermsAcceptedStatus,
-} from '../redux/actions/User';
+} from "../redux/actions/User";
 import {
   StackActions,
   NavigationActions,
   NavigationEvents,
-} from 'react-navigation';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {EDFonts} from '../utils/EDFontConstants';
-import {EDColors} from '../utils/EDColors';
-import Validations from '../utils/Validations';
-import EDRTLTextInput from '../components/EDRTLTextInput';
+} from "react-navigation";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { EDFonts } from "../utils/EDFontConstants";
+import { EDColors } from "../utils/EDColors";
+import Validations from "../utils/Validations";
+import EDRTLTextInput from "../components/EDRTLTextInput";
 import {
   TextFieldTypes,
   debugLog,
   getProportionalFontSize,
   isRTLCheck,
-} from '../utils/EDConstants';
-import EDThemeButton from '../components/EDThemeButton';
-import EDUnderlineButton from '../components/EDUnderlineButton';
-import DeviceInfo from 'react-native-device-info';
-import EDRTLText from '../components/EDRTLText';
-import Metrics from '../utils/metrics';
-import {netStatus} from '../utils/NetworkStatusConnection';
+} from "../utils/EDConstants";
+import EDThemeButton from "../components/EDThemeButton";
+import EDUnderlineButton from "../components/EDUnderlineButton";
+import DeviceInfo from "react-native-device-info";
+import EDRTLText from "../components/EDRTLText";
+import Metrics from "../utils/metrics";
+import { netStatus } from "../utils/NetworkStatusConnection";
 import {
   loginUser,
   updateTermsAndConditionsStatus,
-} from '../utils/ServiceManager';
-import {showNoInternetAlert, showDialogue} from '../utils/EDAlert';
-import EDThemeHeader from '../components/EDThemeHeader';
+} from "../utils/ServiceManager";
+import { showNoInternetAlert, showDialogue } from "../utils/EDAlert";
+import EDThemeHeader from "../components/EDThemeHeader";
 import {
   saveUserLoginDetails,
   flushAllData,
   setIsTermsAndConditionsAccepted,
-} from '../utils/AsyncStorageHelper';
-import EDRTLView from '../components/EDRTLView';
-import EDPopupView from '../components/EDPopupView';
-import EDForgotPassword from '../components/EDForgotPassword';
-import {changeCartButtonVisibility} from '../redux/actions/FloatingButton';
-import EDWebViewComponent from '../components/EDWebViewComponent';
+} from "../utils/AsyncStorageHelper";
+import EDRTLView from "../components/EDRTLView";
+import EDPopupView from "../components/EDPopupView";
+import EDForgotPassword from "../components/EDForgotPassword";
+import { changeCartButtonVisibility } from "../redux/actions/FloatingButton";
+import EDWebViewComponent from "../components/EDWebViewComponent";
 
 class LoginContainer extends React.Component {
   //#region LIFE CYCLE METHODS
@@ -67,15 +67,17 @@ class LoginContainer extends React.Component {
       <KeyboardAwareScrollView
         enableResetScrollToCoords={true}
         // contentContainerStyle={{ flex: 1 }}
-        resetScrollToCoords={{x: 0, y: 0}}
+        resetScrollToCoords={{ x: 0, y: 0 }}
         style={styles.parentView}
         bounces={false}
         // keyboardShouldPersistTaps="always"
         behavior="padding"
-        enabled>
+        enabled
+      >
         <View
-          pointerEvents={this.state.isLoading ? 'none' : 'auto'}
-          style={styles.parentView}>
+          pointerEvents={this.state.isLoading ? "none" : "auto"}
+          style={styles.parentView}
+        >
           <NavigationEvents
             onDidFocus={this.onDidFocusLoginContainer}
             onWillFocus={this.onWillFocusLoginContainer}
@@ -89,44 +91,44 @@ class LoginContainer extends React.Component {
 
           <EDThemeHeader
             onLeftButtonPress={() => this.buttonBackPressed()}
-            title={strings('login.signIn')}
+            title={strings("login.signIn")}
           />
 
           <View
-            pointerEvents={this.state.isLoading ? 'none' : 'auto'}
-            style={styles.mainViewStyle}>
+            pointerEvents={this.state.isLoading ? "none" : "auto"}
+            style={styles.mainViewStyle}
+          >
             <View style={styles.textFieldStyle}>
-              {/* EMAIL INPUT */}
+              {/* Mobile INPUT */}
               <EDRTLTextInput
-                type={TextFieldTypes.email}
-                identifier={'email'}
-                placeholder={strings('login.email')}
+                type={TextFieldTypes.phone}
+                identifier={"mobile"}
+                placeholder={strings("signUpNew.phone")}
                 onChangeText={this.textFieldTextDidChangeHandler}
-                initialValue={this.state.objLoginDetails.email}
                 errorFromScreen={
                   this.state.shouldPerformValidation
-                    ? this.validationsHelper.validateEmail(
-                        this.state.objLoginDetails.email,
-                        strings('validationsNew.emptyEmail'),
+                    ? this.validationsHelper.checkForMobileNumber(
+                        this.state.objLoginDetails.mobile,
+                        strings("validationsNew.emptyPhone")
                       )
-                    : ''
+                    : ""
                 }
               />
 
               {/* PASSWORD INPUT */}
               <EDRTLTextInput
                 type={TextFieldTypes.password}
-                identifier={'password'}
-                placeholder={strings('login.password')}
+                identifier={"password"}
+                placeholder={strings("login.password")}
                 onChangeText={this.textFieldTextDidChangeHandler}
                 initialValue={this.state.objLoginDetails.password}
                 errorFromScreen={
                   this.state.shouldPerformValidation
                     ? this.validationsHelper.checkForEmpty(
                         this.state.objLoginDetails.password,
-                        strings('validationsNew.emptyPassword'),
+                        strings("validationsNew.emptyPassword")
                       )
-                    : ''
+                    : ""
                 }
               />
 
@@ -135,13 +137,13 @@ class LoginContainer extends React.Component {
                 buttonStyle={styles.forgotPasswordButton}
                 textStyle={styles.forgotPasswordText}
                 onPress={this.buttonForgotPasswordPressed}
-                label={strings('login.forgotPassword') + '?'}
+                label={strings("login.forgotPassword") + "?"}
               />
 
               {/* LOGIN BUTTON */}
               <EDThemeButton
                 style={styles.signInButton}
-                label={strings('login.signIn')}
+                label={strings("login.signIn")}
                 isLoading={this.state.isLoading}
                 onPress={this.buttonLoginPressed}
                 isRadius={true}
@@ -151,13 +153,13 @@ class LoginContainer extends React.Component {
               <EDRTLView style={styles.noAccountContainer}>
                 <EDRTLText
                   style={styles.noAccountText}
-                  title={strings('login.noAccount')}
+                  title={strings("login.noAccount")}
                 />
                 <EDUnderlineButton
                   buttonStyle={styles.signUpButton}
                   textStyle={styles.signUpText}
                   onPress={this.buttonSignUpPressed}
-                  label={strings('login.signUp')}
+                  label={strings("login.signUp")}
                 />
               </EDRTLView>
             </View>
@@ -182,10 +184,10 @@ class LoginContainer extends React.Component {
     // this.props.saveUserDetailsInRedux(undefined)
     flushAllData(
       () => {},
-      () => {},
+      () => {}
     );
 
-    this.setState({isTermsAndConditionsDialogueVisible: false});
+    this.setState({ isTermsAndConditionsDialogueVisible: false });
   };
 
   /** RENDER T&C DIALOGUE */
@@ -193,9 +195,10 @@ class LoginContainer extends React.Component {
     return (
       <EDPopupView
         isLoading={this.state.isLoading}
-        isModalVisible={this.state.isTermsAndConditionsDialogueVisible}>
+        isModalVisible={this.state.isTermsAndConditionsDialogueVisible}
+      >
         <EDWebViewComponent
-          cmsSlug={'terms-and-conditions'}
+          cmsSlug={"terms-and-conditions"}
           lan={this.props.lan}
           onAcceptPressHandler={this.onAcceptPressHandler}
           onDismissHandler={this.onDismissTermsAndConditionsDialogue}
@@ -219,7 +222,7 @@ class LoginContainer extends React.Component {
 
   //#region FORGOT PASSWORD BUTTON EVENTS
   onDismissForgotPasswordHandler = () => {
-    this.setState({shouldShowForgotPasswordDialogue: false});
+    this.setState({ shouldShowForgotPasswordDialogue: false });
   };
   //#endregion
 
@@ -227,7 +230,7 @@ class LoginContainer extends React.Component {
   state = {
     isLoading: false,
     shouldPerformValidation: false,
-    objLoginDetails: {email: '', password: ''},
+    objLoginDetails: { mobile: "", password: "" },
     shouldShowForgotPasswordDialogue: false,
     isTermsAndConditionsDialogueVisible: false,
   };
@@ -241,7 +244,7 @@ class LoginContainer extends React.Component {
    */
   textFieldTextDidChangeHandler = (value, identifier) => {
     this.state.objLoginDetails[identifier] = value.trim();
-    this.setState({shouldPerformValidation: false});
+    this.setState({ shouldPerformValidation: false });
   };
   //#endregion
 
@@ -251,15 +254,15 @@ class LoginContainer extends React.Component {
    * @param {Checking all conditions and redirect to home screen on success}
    */
   buttonLoginPressed = () => {
-    this.setState({shouldPerformValidation: true});
+    this.setState({ shouldPerformValidation: true });
     if (
-      this.validationsHelper.validateEmail(
-        this.state.objLoginDetails.email.trim(),
-        strings('validationsNew.emptyEmail'),
+      this.validationsHelper.checkForMobileNumber(
+        this.state.objLoginDetails.mobile.trim(),
+        strings("validationsNew.emptyPhone")
       ).length > 0 ||
       this.validationsHelper.checkForEmpty(
         this.state.objLoginDetails.password.trim(),
-        strings('validationsNew.emptyPassword'),
+        strings("validationsNew.emptyPassword")
       ).length > 0
     ) {
       return;
@@ -273,14 +276,14 @@ class LoginContainer extends React.Component {
       this.objUserDetailsToSave == undefined ||
       this.objUserDetailsToSave == null
     ) {
-      showDialogue(strings('generalNew.generalWebServiceError'));
+      showDialogue(strings("generalNew.generalWebServiceError"));
       return;
     }
     this.props.saveUserDetailsInRedux(this.objUserDetailsToSave);
     saveUserLoginDetails(
       this.objUserDetailsToSave,
-      (onSuccess) => debugLog('SUCCESS ASYNC STORE :: ', onSuccess),
-      (onFailure) => debugLog('FAILURE ASYNC STORE :: ', onFailure),
+      (onSuccess) => debugLog("SUCCESS ASYNC STORE :: ", onSuccess),
+      (onFailure) => debugLog("FAILURE ASYNC STORE :: ", onFailure)
     );
 
     if (this.isCheckOutContinue === true) {
@@ -289,8 +292,8 @@ class LoginContainer extends React.Component {
       this.props.navigation.dispatch(
         StackActions.reset({
           index: 0,
-          actions: [NavigationActions.navigate({routeName: 'main'})],
-        }),
+          actions: [NavigationActions.navigate({ routeName: "main" })],
+        })
       );
     }
   };
@@ -303,9 +306,9 @@ class LoginContainer extends React.Component {
    */
   onLoginSuccess = (objSuccess) => {
     if (objSuccess.data !== undefined && objSuccess.data.login !== undefined) {
-      var isTAndCAccepted = (objSuccess.data.login.tnc_status || '') == '1';
+      var isTAndCAccepted = (objSuccess.data.login.tnc_status || "") == "1";
       this.props.saveTermsAndConditionsStatus(isTAndCAccepted);
-      console.log("objSuccess.data.login :: => ", objSuccess.data.login)
+      console.log("objSuccess.data.login :: => ", objSuccess.data.login);
       this.objUserDetailsToSave = objSuccess.data.login;
 
       this.setState({
@@ -324,11 +327,11 @@ class LoginContainer extends React.Component {
    * @param {The success response object} objSuccess
    */
   onLoginFailure = (objFailure) => {
-    this.setState({isLoading: false});
-    showDialogue(objFailure.message, '', [], () => {
-      this.state.objLoginDetails['email'] = '';
-      this.state.objLoginDetails['password'] = '';
-      this.setState({shouldPerformValidation: false});
+    this.setState({ isLoading: false });
+    showDialogue(objFailure.message, "", [], () => {
+      this.state.objLoginDetails["mobile"] = "";
+      this.state.objLoginDetails["password"] = "";
+      this.setState({ shouldPerformValidation: false });
     });
   };
 
@@ -337,15 +340,15 @@ class LoginContainer extends React.Component {
       if (isConnected) {
         let objLoginParams = {
           language_slug: this.props.lan,
-          Email: this.state.objLoginDetails.email,
+          Mobile: this.state.objLoginDetails.mobile,
           Password: this.state.objLoginDetails.password,
         };
-        this.setState({isLoading: true});
+        this.setState({ isLoading: true });
         loginUser(
           objLoginParams,
           this.onLoginSuccess,
           this.onLoginFailure,
-          this.props,
+          this.props
         );
       } else {
         showNoInternetAlert();
@@ -358,14 +361,14 @@ class LoginContainer extends React.Component {
       this.objUserDetailsToSave == undefined ||
       this.objUserDetailsToSave.UserID == undefined
     ) {
-      this.setState({isTermsAndConditionsDialogueVisible: false});
+      this.setState({ isTermsAndConditionsDialogueVisible: false });
       this.props.saveTermsAndConditionsStatus(true);
-      this.props.navigation.navigate('register');
+      this.props.navigation.navigate("register");
       return;
     }
     netStatus((status) => {
       if (status) {
-        this.setState({isLoading: true});
+        this.setState({ isLoading: true });
         let paramsUpdateTAndCStatus = {
           language_slug: this.props.lan,
           user_id: this.objUserDetailsToSave.UserID,
@@ -379,7 +382,7 @@ class LoginContainer extends React.Component {
           paramsUpdateTAndCStatus,
           this.onSuccessTAndCUpdate,
           this.onFailureTAndCUpdate,
-          this.props,
+          this.props
         );
       } else {
         showNoInternetAlert();
@@ -396,9 +399,9 @@ class LoginContainer extends React.Component {
     setIsTermsAndConditionsAccepted(
       true,
       () => {},
-      () => {},
+      () => {}
     );
-    this.setState({isLoading: false});
+    this.setState({ isLoading: false });
     this.navigateToNextScreen();
   };
 
@@ -407,7 +410,7 @@ class LoginContainer extends React.Component {
    * @param {The failure response object parsed from CMS API response} objFailure
    */
   onFailureTAndCUpdate = (objFailure) => {
-    this.setState({isLoading: false});
+    this.setState({ isLoading: false });
     showDialogue(objFailure.message);
   };
 
@@ -416,7 +419,7 @@ class LoginContainer extends React.Component {
    * @param {Redirecting user to forgot screen on forgot button click}
    */
   buttonForgotPasswordPressed = () => {
-    this.setState({shouldShowForgotPasswordDialogue: true});
+    this.setState({ shouldShowForgotPasswordDialogue: true });
   };
 
   /**
@@ -425,16 +428,16 @@ class LoginContainer extends React.Component {
    */
   buttonSignUpPressed = () => {
     if (this.props.isTermsAndConditionsAccepted) {
-      this.props.navigation.navigate('register');
+      this.props.navigation.navigate("register");
     } else {
-      this.setState({isTermsAndConditionsDialogueVisible: true});
+      this.setState({ isTermsAndConditionsDialogueVisible: true });
     }
 
     // this.props.navigation.navigate('register');
   };
 
   buttonBackPressed() {
-    console.log('kdbasjkdhbajksdhas');
+    console.log("kdbasjkdhbajksdhas");
     this.props.navigation.goBack();
   }
   //#endregion
@@ -456,10 +459,10 @@ class LoginContainer extends React.Component {
 
 //#region STYLES
 const styles = StyleSheet.create({
-  parentView: {flex: 1, backgroundColor: EDColors.white},
+  parentView: { flex: 1, backgroundColor: EDColors.white },
   mainViewStyle: {
     flex: 1,
-    flexDirection: 'column',
+    flexDirection: "column",
     backgroundColor: EDColors.white,
   },
   textFieldStyle: {
@@ -468,7 +471,7 @@ const styles = StyleSheet.create({
   },
   forgotPasswordButton: {
     borderBottomColor: EDColors.text,
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
     marginHorizontal: 20,
     marginVertical: 15,
   },
@@ -484,23 +487,23 @@ const styles = StyleSheet.create({
   },
   // signInText: { color: EDColors.primary },
   bottomContainer: {
-    justifyContent: 'flex-end',
+    justifyContent: "flex-end",
     backgroundColor: EDColors.transparent,
   },
   noAccountContainer: {
-    justifyContent: 'center',
+    justifyContent: "center",
     marginTop: 15,
-    alignItems: 'center',
+    alignItems: "center",
   },
   noAccountText: {
     color: EDColors.noAccount,
     fontFamily: EDFonts.regular,
     fontSize: getProportionalFontSize(14),
   },
-  signUpButton: {borderBottomColor: EDColors.homeButtonColor},
-  signUpText: {color: EDColors.homeButtonColor},
+  signUpButton: { borderBottomColor: EDColors.homeButtonColor },
+  signUpText: { color: EDColors.homeButtonColor },
   versionTextStyle: {
-    textAlign: 'center',
+    textAlign: "center",
     fontFamily: EDFonts.regular,
     fontSize: getProportionalFontSize(14),
     color: EDColors.text,
@@ -532,5 +535,5 @@ export default connect(
         dispatch(saveTermsAcceptedStatus(dataToSave));
       },
     };
-  },
+  }
 )(LoginContainer);

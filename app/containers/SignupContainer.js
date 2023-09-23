@@ -135,14 +135,14 @@ class SignUpContainer extends React.PureComponent {
               identifier={"email"}
               placeholder={strings("signUpNew.email")}
               onChangeText={this.textFieldTextDidChangeHandler}
-              errorFromScreen={
-                this.state.shouldPerformValidation
-                  ? this.validationsHelper.validateEmail(
-                      this.state.objRegistrationDetails.email,
-                      strings("validationsNew.emptyEmail")
-                    )
-                  : ""
-              }
+              // errorFromScreen={
+              //   this.state.shouldPerformValidation
+              //     ? this.validationsHelper.validateEmail(
+              //         this.state.objRegistrationDetails.email,
+              //         strings("validationsNew.emptyEmail")
+              //       )
+              //     : ""
+              // }
             />
             {/* MOBILE INPUT */}
             <EDRTLTextInput
@@ -484,10 +484,6 @@ class SignUpContainer extends React.PureComponent {
       this.validationsHelper.checkForEmpty(
         this.state.objRegistrationDetails.lastName.trim(),
         strings("validationsNew.emptyLastName")
-      ).length > 0 ||
-      this.validationsHelper.validateEmail(
-        this.state.objRegistrationDetails.email.trim(),
-        strings("validationsNew.emailEmpty")
       ).length > 0 ||
       this.validationsHelper.validatePassword(
         this.state.objRegistrationDetails.password.trim(),
