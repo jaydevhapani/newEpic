@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { connect } from "react-redux";
 import { strings } from "../locales/i18n";
 import {
@@ -99,21 +99,133 @@ class LoginContainer extends React.Component {
             style={styles.mainViewStyle}
           >
             <View style={styles.textFieldStyle}>
-              {/* Mobile INPUT */}
-              <EDRTLTextInput
-                type={TextFieldTypes.phone}
-                identifier={"mobile"}
-                placeholder={strings("signUpNew.phone")}
-                onChangeText={this.textFieldTextDidChangeHandler}
-                errorFromScreen={
-                  this.state.shouldPerformValidation
-                    ? this.validationsHelper.checkForMobileNumber(
-                        this.state.objLoginDetails.mobile,
-                        strings("validationsNew.emptyPhone")
-                      )
-                    : ""
-                }
-              />
+              {/* //SET THE RADIO BUTTON OF EMAIl AND PASSWORD */}
+
+              <View style={{ flexDirection: "row", marginTop: 20 }}>
+                <View style={{ flexDirection: "row" }}>
+                  <TouchableOpacity
+                    style={{
+                      height: 26,
+                      width: 26,
+                      borderRadius: 15,
+                      borderColor: EDColors.grey,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderWidth: 1,
+                      marginLeft: 20,
+                    }}
+                    onPress={() => {
+                      this.setState({
+                        ObjEmailOrPassword: {
+                          isEmail: true,
+                          isPhone: false,
+                        },
+                      });
+                    }}
+                  >
+                    {this.state.ObjEmailOrPassword.isEmail && (
+                      <View
+                        style={{
+                          height: 20,
+                          width: 20,
+                          backgroundColor: EDColors.homeButtonColor,
+                          borderRadius: 15,
+                        }}
+                      />
+                    )}
+                  </TouchableOpacity>
+                  <View>
+                    <Text
+                      style={{
+                        color: "black",
+                        fontSize: 20,
+                        marginHorizontal: 6,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Email
+                    </Text>
+                  </View>
+                </View>
+                <View style={{ flexDirection: "row" }}>
+                  <TouchableOpacity
+                    style={{
+                      height: 26,
+                      width: 26,
+                      borderRadius: 15,
+                      borderColor: EDColors.grey,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderWidth: 1,
+                      marginLeft: 20,
+                    }}
+                    onPress={() => {
+                      this.setState({
+                        ObjEmailOrPassword: {
+                          isPhone: true,
+                          isEmail: false,
+                        },
+                      });
+                    }}
+                  >
+                    {this.state.ObjEmailOrPassword.isPhone && (
+                      <View
+                        style={{
+                          height: 20,
+                          width: 20,
+                          backgroundColor: EDColors.homeButtonColor,
+                          borderRadius: 15,
+                        }}
+                      />
+                    )}
+                  </TouchableOpacity>
+                  <View>
+                    <Text
+                      style={{
+                        color: "black",
+                        fontSize: 20,
+                        marginHorizontal: 6,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Phone
+                    </Text>
+                  </View>
+                </View>
+              </View>
+              {this.state.ObjEmailOrPassword.isPhone && (
+                <EDRTLTextInput
+                  type={TextFieldTypes.phone}
+                  identifier={"mobile"}
+                  placeholder={strings("signUpNew.phone")}
+                  onChangeText={this.textFieldTextDidChangeHandler}
+                  errorFromScreen={
+                    this.state.shouldPerformValidation
+                      ? this.validationsHelper.checkForMobileNumber(
+                          this.state.objLoginDetails.mobile,
+                          strings("validationsNew.emptyPhone")
+                        )
+                      : ""
+                  }
+                />
+              )}
+
+              {this.state.ObjEmailOrPassword.isEmail && (
+                <EDRTLTextInput
+                  type={TextFieldTypes.email}
+                  identifier={"email"}
+                  placeholder={strings("signUpNew.email")}
+                  onChangeText={this.textFieldTextDidChangeHandler}
+                  errorFromScreen={
+                    this.state.shouldPerformValidation
+                      ? this.validationsHelper.validateEmail(
+                          this.state.objLoginDetails.email,
+                          strings("validationsNew.emptyEmail")
+                        )
+                      : ""
+                  }
+                />
+              )}
 
               {/* PASSWORD INPUT */}
               <EDRTLTextInput
@@ -230,9 +342,13 @@ class LoginContainer extends React.Component {
   state = {
     isLoading: false,
     shouldPerformValidation: false,
-    objLoginDetails: { mobile: "", password: "" },
+    objLoginDetails: { mobile: "", password: "", email: "" },
     shouldShowForgotPasswordDialogue: false,
     isTermsAndConditionsDialogueVisible: false,
+    ObjEmailOrPassword: {
+      isPhone: true,
+      isEmail: false,
+    },
   };
   //#endregion
 
@@ -256,19 +372,31 @@ class LoginContainer extends React.Component {
   buttonLoginPressed = () => {
     this.setState({ shouldPerformValidation: true });
     if (
-      this.validationsHelper.checkForMobileNumber(
-        this.state.objLoginDetails.mobile.trim(),
-        strings("validationsNew.emptyPhone")
-      ).length > 0 ||
       this.validationsHelper.checkForEmpty(
         this.state.objLoginDetails.password.trim(),
         strings("validationsNew.emptyPassword")
       ).length > 0
     ) {
       return;
+    } else if (
+      this.state.ObjEmailOrPassword.isEmail &&
+      this.validationsHelper.validateEmail(
+        this.state.objLoginDetails.email.trim(),
+        strings("validationsNew.emptyEmail")
+      ).length > 0
+    ) {
+      return;
+    } else if (
+      this.state.ObjEmailOrPassword.isPhone &&
+      this.validationsHelper.checkForMobileNumber(
+        this.state.objLoginDetails.mobile.trim(),
+        strings("validationsNew.emptyPhone")
+      ).length > 0
+    ) {
+      return;
+    } else {
+      this.callLoginAPI();
     }
-
-    this.callLoginAPI();
   };
 
   navigateToNextScreen = () => {
@@ -340,8 +468,12 @@ class LoginContainer extends React.Component {
       if (isConnected) {
         let objLoginParams = {
           language_slug: this.props.lan,
-          Mobile: this.state.objLoginDetails.mobile,
+          PhoneNumber: this.state.objLoginDetails.mobile,
+          Email: this.state.objLoginDetails.email,
           Password: this.state.objLoginDetails.password,
+          login_using: this.state.ObjEmailOrPassword.isEmail
+            ? "email"
+            : "phone",
         };
         this.setState({ isLoading: true });
         loginUser(

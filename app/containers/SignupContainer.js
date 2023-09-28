@@ -129,36 +129,134 @@ class SignUpContainer extends React.PureComponent {
               }
             />
 
+            {/* //SET THE RADIO BUTTON OF EMAIl AND PASSWORD */}
+
+            <View style={{ flexDirection: "row", marginTop: 20 }}>
+              <View style={{ flexDirection: "row" }}>
+                <TouchableOpacity
+                  style={{
+                    height: 26,
+                    width: 26,
+                    borderRadius: 15,
+                    borderColor: EDColors.grey,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderWidth: 1,
+                    marginLeft: 20,
+                  }}
+                  onPress={() => {
+                    this.setState({
+                      ObjEmailOrPassword: {
+                        isEmail: true,
+                        isPhone: false,
+                      },
+                    });
+                  }}
+                >
+                  {this.state.ObjEmailOrPassword.isEmail && (
+                    <View
+                      style={{
+                        height: 20,
+                        width: 20,
+                        backgroundColor: EDColors.homeButtonColor,
+                        borderRadius: 15,
+                      }}
+                    />
+                  )}
+                </TouchableOpacity>
+                <View>
+                  <Text
+                    style={{
+                      color: "black",
+                      fontSize: 20,
+                      marginHorizontal: 6,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Email
+                  </Text>
+                </View>
+              </View>
+              <View style={{ flexDirection: "row" }}>
+                <TouchableOpacity
+                  style={{
+                    height: 26,
+                    width: 26,
+                    borderRadius: 15,
+                    borderColor: EDColors.grey,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderWidth: 1,
+                    marginLeft: 20,
+                  }}
+                  onPress={() => {
+                    this.setState({
+                      ObjEmailOrPassword: {
+                        isPhone: true,
+                        isEmail: false,
+                      },
+                    });
+                  }}
+                >
+                  {this.state.ObjEmailOrPassword.isPhone && (
+                    <View
+                      style={{
+                        height: 20,
+                        width: 20,
+                        backgroundColor: EDColors.homeButtonColor,
+                        borderRadius: 15,
+                      }}
+                    />
+                  )}
+                </TouchableOpacity>
+                <View>
+                  <Text
+                    style={{
+                      color: "black",
+                      fontSize: 20,
+                      marginHorizontal: 6,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Phone
+                  </Text>
+                </View>
+              </View>
+            </View>
+
             {/* E-MAIL INPUT */}
-            <EDRTLTextInput
-              type={TextFieldTypes.email}
-              identifier={"email"}
-              placeholder={strings("signUpNew.email")}
-              onChangeText={this.textFieldTextDidChangeHandler}
-              // errorFromScreen={
-              //   this.state.shouldPerformValidation
-              //     ? this.validationsHelper.validateEmail(
-              //         this.state.objRegistrationDetails.email,
-              //         strings("validationsNew.emptyEmail")
-              //       )
-              //     : ""
-              // }
-            />
-            {/* MOBILE INPUT */}
-            <EDRTLTextInput
-              type={TextFieldTypes.phone}
-              identifier={"mobile"}
-              placeholder={strings("signUpNew.phone")}
-              onChangeText={this.textFieldTextDidChangeHandler}
-              errorFromScreen={
-                this.state.shouldPerformValidation
-                  ? this.validationsHelper.checkForMobileNumber(
-                      this.state.objRegistrationDetails.mobile,
-                      strings("validationsNew.emptyPhone")
-                    )
-                  : ""
-              }
-            />
+            {this.state.ObjEmailOrPassword.isPhone && (
+              <EDRTLTextInput
+                type={TextFieldTypes.phone}
+                identifier={"mobile"}
+                placeholder={strings("signUpNew.phone")}
+                onChangeText={this.textFieldTextDidChangeHandler}
+                errorFromScreen={
+                  this.state.shouldPerformValidation
+                    ? this.validationsHelper.checkForMobileNumber(
+                        this.state.objRegistrationDetails.mobile,
+                        strings("validationsNew.emptyPhone")
+                      )
+                    : ""
+                }
+              />
+            )}
+            {this.state.ObjEmailOrPassword.isEmail && (
+              <EDRTLTextInput
+                type={TextFieldTypes.email}
+                identifier={"email"}
+                placeholder={strings("signUpNew.email")}
+                onChangeText={this.textFieldTextDidChangeHandler}
+                errorFromScreen={
+                  this.state.shouldPerformValidation
+                    ? this.validationsHelper.validateEmail(
+                        this.state.objRegistrationDetails.email,
+                        strings("validationsNew.emptyEmail")
+                      )
+                    : ""
+                }
+              />
+            )}
 
             {/* Date Of Birth */}
             <EDRTLTextInput
@@ -415,7 +513,11 @@ class SignUpContainer extends React.PureComponent {
     isSignUpObjectDoneMessage: undefined,
     enterOtp: undefined,
     getEntry_userID: undefined,
-    isOtpLoader : false,
+    isOtpLoader: false,
+    ObjEmailOrPassword: {
+      isPhone: true,
+      isEmail: false,
+    },
   };
   //#endregion
 
@@ -489,13 +591,25 @@ class SignUpContainer extends React.PureComponent {
         this.state.objRegistrationDetails.password.trim(),
         strings("validationsNew.emptyPassword")
       ).length > 0 ||
-      this.validationsHelper.checkForMobileNumber(
-        this.state.objRegistrationDetails.mobile.trim(),
-        strings("validationsNew.emptyPhone")
-      ).length > 0 ||
       this.validationsHelper.checkForEmpty(
         this.state.objRegistrationDetails.date_of_birth.trim(),
         strings("validationsNew.emptyDateOfBirth")
+      ).length > 0
+    ) {
+      return;
+    } else if (
+      this.state.ObjEmailOrPassword.isEmail &&
+      this.validationsHelper.validateEmail(
+        this.state.objRegistrationDetails.email.trim(),
+        strings("validationsNew.emptyEmail")
+      ).length > 0
+    ) {
+      return;
+    } else if (
+      this.state.ObjEmailOrPassword.isPhone &&
+      this.validationsHelper.checkForMobileNumber(
+        this.state.objRegistrationDetails.mobile.trim(),
+        strings("validationsNew.emptyPhone")
       ).length > 0
     ) {
       return;
@@ -520,13 +634,16 @@ class SignUpContainer extends React.PureComponent {
   onSignUpSuccess = (objSuccess) => {
     this.setState({ isLoading: false });
     console.log("ObjeSignUp :: ", objSuccess);
-    // showDialogue(objSuccess.message, '', [], this.buttonBackPressed);
-    this.setState({
-      isOtpBoxVisible: true,
-      isSignUpObjectDoneMessage:
-        "Registration has been done successfully.Please enter your otp to activate your account.",
-      getEntry_userID: objSuccess?.data?.User?.entity_id,
-    });
+    if (this.state.ObjEmailOrPassword.isEmail) {
+      showDialogue(objSuccess.message, "", [], this.buttonBackPressed);
+    } else {
+      this.setState({
+        isOtpBoxVisible: true,
+        isSignUpObjectDoneMessage:
+          "Registration has been done successfully.Please enter your otp to activate your account.",
+        getEntry_userID: objSuccess?.data?.User?.entity_id,
+      });
+    }
   };
 
   /**
@@ -553,6 +670,9 @@ class SignUpContainer extends React.PureComponent {
           device_id: deviceInfoModule.getDeviceId(),
           language_slug: this.props.lan,
           date_of_birth: this.state.objRegistrationDetails.date_of_birth,
+          registration_using: this.state.ObjEmailOrPassword.isEmail
+            ? "email"
+            : "phone",
         };
         this.setState({ isLoading: true });
         signUpUser(
