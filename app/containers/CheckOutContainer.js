@@ -822,6 +822,9 @@ class CheckOutContainer extends React.PureComponent {
     if (this.addToCartDict?.chk_in_stock?.in_stock != 0) {
       this.addOrderData(checkoutData);
     }
+    else {
+      showDialogue('Item is Not available in stock..');
+    }
     // if (this.itemsNameArray.length > 0) {
     //   this.KeyString = this.itemsNameArray.join("\n");
     //   this.alertString =
