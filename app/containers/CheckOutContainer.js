@@ -778,7 +778,10 @@ class CheckOutContainer extends React.PureComponent {
     this.itemsNameArray = [];
     this.KeyString = "";
     this.addToCartDict.out_of_stock.map((key) => {
+      console.log("key :: ", key);
       this.addToCartDict.items.map((item) => {
+        console.log("menu_id :: ", item.menu_id);
+
         if (item.menu_id == key) {
           this.itemsNameArray.push(item.name);
         }
@@ -816,87 +819,89 @@ class CheckOutContainer extends React.PureComponent {
       store_id: this.props.cartDetail.store_id,
       payment_option: "paypal",
     };
-
-    if (this.itemsNameArray.length > 0) {
-      this.KeyString = this.itemsNameArray.join("\n");
-      this.alertString =
-        this.itemsNameArray.length > 1
-          ? strings("checkoutNew.belowProducts") +
-            "\n\n" +
-            this.KeyString +
-            "\n\n" +
-            strings("checkoutNew.removeProducts")
-          : this.KeyString + " " + strings("checkoutNew.outOfStockAndRemove");
-      showDialogue(this.alertString);
-    } else if (stock_error_items.length > 0) {
-      let normalItems = stock_error_items.filter((key) => {
-        return key.is_customize == 0;
-      });
-      let nameArray = normalItems
-        .map(
-          (key) =>
-            key.name +
-            " :\n" +
-            strings("checkoutNew.currentStock") +
-            " - " +
-            key.in_stock +
-            " , " +
-            strings("checkoutNew.maxQuantity") +
-            " - " +
-            key.max_quantity
-        )
-        .join("\n\n");
-      let customItems = stock_error_items.filter((key) => {
-        return key.is_customize !== 0;
-      });
-      let nameArrayCustom = [];
-      customItems.map((data) => {
-        data.addons_category_list.map((item) => {
-          item.addons_list.map((items) => {
-            debugLog(
-              "TEST ADDON :::::",
-              data.name,
-              item.addons_category,
-              items.in_stock
-            );
-            let temp = {
-              name: data.name,
-              addons_category: item.addons_category,
-              addons_category_name: items.add_ons_name,
-              in_stock: items.in_stock,
-              max_quantity: items.max_quantity,
-            };
-            nameArrayCustom.push(temp);
-          });
-        });
-      });
-      let cutomNameArray = nameArrayCustom
-        .map(
-          (key) =>
-            key.name +
-            " (" +
-            key.addons_category +
-            ")" +
-            " :\n" +
-            strings("checkoutNew.currentStock") +
-            " - " +
-            key.in_stock +
-            " , " +
-            strings("checkoutNew.maxQuantity") +
-            " - " +
-            key.max_quantity
-        )
-        .join("\n\n");
-      debugLog("NAME ARRAY ::::", nameArray, nameArrayCustom);
-      let alertMsg =
-        strings("checkoutNew.noStock") + nameArray + "\n\n" + cutomNameArray;
-      showDialogue(alertMsg);
-    } else {
-      // this.props.navigation.navigate("payment", {
-      //     checkoutDetail: checkoutData
-      // })
+    if (this.addToCartDict?.chk_in_stock?.in_stock != 0) {
       this.addOrderData(checkoutData);
     }
+    // if (this.itemsNameArray.length > 0) {
+    //   this.KeyString = this.itemsNameArray.join("\n");
+    //   this.alertString =
+    //     this.itemsNameArray.length > 1
+    //       ? strings("checkoutNew.belowProducts") +
+    //         "\n\n" +
+    //         this.KeyString +
+    //         "\n\n" +
+    //         strings("checkoutNew.removeProducts")
+    //       : this.KeyString + " " + strings("checkoutNew.outOfStockAndRemove");
+    //   showDialogue(this.alertString);
+    // } else if (stock_error_items.length > 0) {
+    //   let normalItems = stock_error_items.filter((key) => {
+    //     return key.is_customize == 0;
+    //   });
+    //   let nameArray = normalItems
+    //     .map(
+    //       (key) =>
+    //         key.name +
+    //         " :\n" +
+    //         strings("checkoutNew.currentStock") +
+    //         " - " +
+    //         key.in_stock +
+    //         " , " +
+    //         strings("checkoutNew.maxQuantity") +
+    //         " - " +
+    //         key.max_quantity
+    //     )
+    //     .join("\n\n");
+    //   let customItems = stock_error_items.filter((key) => {
+    //     return key.is_customize !== 0;
+    //   });
+    //   let nameArrayCustom = [];
+    //   customItems.map((data) => {
+    //     data.addons_category_list.map((item) => {
+    //       item.addons_list.map((items) => {
+    //         debugLog(
+    //           "TEST ADDON :::::",
+    //           data.name,
+    //           item.addons_category,
+    //           items.in_stock
+    //         );
+    //         let temp = {
+    //           name: data.name,
+    //           addons_category: item.addons_category,
+    //           addons_category_name: items.add_ons_name,
+    //           in_stock: items.in_stock,
+    //           max_quantity: items.max_quantity,
+    //         };
+    //         nameArrayCustom.push(temp);
+    //       });
+    //     });
+    //   });
+    //   let cutomNameArray = nameArrayCustom
+    //     .map(
+    //       (key) =>
+    //         key.name +
+    //         " (" +
+    //         key.addons_category +
+    //         ")" +
+    //         " :\n" +
+    //         strings("checkoutNew.currentStock") +
+    //         " - " +
+    //         key.in_stock +
+    //         " , " +
+    //         strings("checkoutNew.maxQuantity") +
+    //         " - " +
+    //         key.max_quantity
+    //     )
+    //     .join("\n\n");
+    //   debugLog("NAME ARRAY ::::", nameArray, nameArrayCustom);
+    //   let alertMsg =
+    //     strings("checkoutNew.noStock") + nameArray + "\n\n" + cutomNameArray;
+    //   showDialogue(alertMsg);
+    // } else {
+    //   // this.props.navigation.navigate("payment", {
+    //   //     checkoutDetail: checkoutData
+    //   // })
+    //   this.addOrderData(checkoutData);
+    // }
   };
 
   /**
