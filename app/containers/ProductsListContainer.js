@@ -201,17 +201,19 @@ class ProductsListContainer extends React.Component {
           containerStyle={{backgroundColor: EDColors.offWhite}}
           inputContainerStyle={{
             // borderColor: EDColors.shadow,
-            // borderWidth: 1,
-            shadowOpacity: 0.25,
+            borderWidth: 0.6,
+            borderBottomWidth : 0.6,
+            shadowOpacity: 1,
             shadowRadius: 5,
-            shadowColor: EDColors.text,
-            shadowOffset: {height: 0, width: 0},
+            shadowColor: EDColors.borderColor,
+            shadowOffset: {height: 10, width: 10},
             backgroundColor: EDColors.white,
             flexDirection: isRTLCheck() ? 'row-reverse' : 'row',
           }}
           inputStyle={{
-            color: EDColors.text,
-            fontFamily: EDFonts.regular,
+            color: EDColors.textAccount,
+            fontFamily: EDFonts.bold,
+            fontWeight : '500',
             fontSize: getProportionalFontSize(14),
             textAlign: isRTLCheck() ? 'right' : 'left',
           }}
