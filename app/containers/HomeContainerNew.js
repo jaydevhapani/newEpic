@@ -782,6 +782,28 @@ class HomeContainerNew extends React.PureComponent {
     }
   };
 
+
+  //getBanners
+  getBannersFromApi = () => {
+    try {
+      const formdata = new FormData();
+      formdata.append("store_id", 43);
+      console.log("abdjkabsdjkasb : ", formdata);
+      fetch("https://epicwinesandspirits.africa/v2/Api/getBanners", {
+        method: "POST",
+        body: formdata,
+      })
+        .then((response) => response.json())
+        .then((json) => {
+          if (json?.status == 'success') {
+            this.arrayBannerImages = json?.banners;
+          }
+        });
+    } catch (error) {
+      console.log("error : ", error);
+    }
+  }
+
   /**
    *
    * @param {The success response object} objSuccess
@@ -801,6 +823,9 @@ class HomeContainerNew extends React.PureComponent {
     var objData = objSuccess.data || {};
     this.refreshing = false;
     console.log("HOMENEWOBJSUCCESSDATA:::::::", objSuccess.data);
+    
+    //for get the bannders from api
+    this.getBannersFromApi();
 
     if (
       objData.featured_brands !== undefined &&
