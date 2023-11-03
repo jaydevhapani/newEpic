@@ -21,7 +21,7 @@ export default class ShopByCategoryComponent extends React.PureComponent {
                 {this.props.shopByData !== undefined
                     ? this.props.shopByData.length > 0
                         ? <FlatList
-                            numColumns={Metrics.screenWidth > 375 ? 4 : 3}
+                            numColumns={3}
                             showsHorizontalScrollIndicator={false}
                             data={this.props.shopByData}
                             renderItem={this.renderShopByItem}
@@ -36,7 +36,7 @@ export default class ShopByCategoryComponent extends React.PureComponent {
 
     //#region HELPER METHODS
     renderShopByItem = (shopByItem) => {
-        return <ShopByItem onSelectionHandler={this.props.onSelectionHandler} itemToLoad={shopByItem.item} />
+        return <ShopByItem onSelectionHandler={this.props.onSelectionHandler} itemToLoad={shopByItem.item} homeHorizontal/>
     }
     //#endregion
 }

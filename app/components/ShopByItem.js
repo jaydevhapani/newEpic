@@ -44,6 +44,7 @@ export default class ShopByItem extends React.PureComponent {
         style={[
           style.parentContainer,
           this.props.isForBrands ? {height: PARENT_WIDTH * 1.25} : {},
+          this.props.homeHorizontal && {marginHorizontal : PARENT_WIDTH / 6.6 , alignSelf : 'center'}
         ]}>
         <View style={[style.shadowContainer]}>
           <View
