@@ -236,6 +236,7 @@ class ProductsListContainer extends React.Component {
                 contentContainerStyle={{
                   paddingBottom: this.props.cartCount > 0 ? 100 : 10,
                 }}
+                numColumns={3}
                 style={[styles.productsList]}
                 data={this.state.arrayProducts}
                 extraData={this.state}
@@ -389,6 +390,7 @@ class ProductsListContainer extends React.Component {
       this.props.cartDetail.items !== undefined &&
       this.props.cartDetail.length !== 0
     ) {
+      console.log('PRODUCT ADDDD : ', productToAdd);
       let cartData = this.props.cartDetail.items;
       let arr = cartData.filter((p) => {
         return p.menu_id == productToAdd.menu_id;
@@ -399,6 +401,7 @@ class ProductsListContainer extends React.Component {
           productToAdd.item_in_stock !== 0 &&
           productToAdd.item_in_stock > arr[0].quantity
         ) {
+          console.log('Array Quntity :: ' + arr[0].quantity + ' ' +productToAdd.item_max_quantity);
           if (productToAdd.item_max_quantity > arr[0].quantity)
             this.storeData(productToAdd);
           else
