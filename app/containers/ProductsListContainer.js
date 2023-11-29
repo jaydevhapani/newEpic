@@ -1,46 +1,50 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   StyleSheet,
   SafeAreaView,
   FlatList,
   RefreshControl,
-} from 'react-native';
-import {connect} from 'react-redux';
-import {strings} from '../locales/i18n';
-import {EDColors} from '../utils/EDColors';
+} from "react-native";
+import { connect } from "react-redux";
+import { strings } from "../locales/i18n";
+import { EDColors } from "../utils/EDColors";
 import {
   debugLog,
   ProductsListType,
   isRTLCheck,
   getProportionalFontSize,
-} from '../utils/EDConstants';
-import {netStatus} from '../utils/NetworkStatusConnection';
-import {getProducts} from '../utils/ServiceManager';
-import {showValidationAlert} from '../utils/EDAlert';
-import BaseContainer from './BaseContainer';
-import {NavigationEvents} from 'react-navigation';
-import EDProgressLoader from '../components/EDProgressLoader';
-import EDPlaceholderComponent from '../components/EDPlaceholderComponent';
-import {changeCartButtonVisibility} from '../redux/actions/FloatingButton';
-import {saveNavigationSelection} from '../redux/actions/Navigation';
-import ProductComponent from '../components/ProductComponent';
-import {saveCartData} from '../utils/AsyncStorageHelper';
-import Toast from 'react-native-easy-toast';
-import {saveCartDataInRedux, saveCartCount} from '../redux/actions/Checkout';
-import EDPopupView from '../components/EDPopupView';
-import EDAddonsModalComponent from '../components/EDAddonsModalComponent';
-import {SearchBar} from 'react-native-elements';
-import {EDFonts} from '../utils/EDFontConstants';
+} from "../utils/EDConstants";
+import { netStatus } from "../utils/NetworkStatusConnection";
+import { getProducts } from "../utils/ServiceManager";
+import { showValidationAlert } from "../utils/EDAlert";
+import BaseContainer from "./BaseContainer";
+import { NavigationEvents } from "react-navigation";
+import EDProgressLoader from "../components/EDProgressLoader";
+import EDPlaceholderComponent from "../components/EDPlaceholderComponent";
+import { changeCartButtonVisibility } from "../redux/actions/FloatingButton";
+import { saveNavigationSelection } from "../redux/actions/Navigation";
+import ProductComponent from "../components/ProductComponent";
+import { saveCartData } from "../utils/AsyncStorageHelper";
+import Toast from "react-native-easy-toast";
+import { saveCartDataInRedux, saveCartCount } from "../redux/actions/Checkout";
+import EDPopupView from "../components/EDPopupView";
+import EDAddonsModalComponent from "../components/EDAddonsModalComponent";
+import { SearchBar } from "react-native-elements";
+import { EDFonts } from "../utils/EDFontConstants";
+import { TouchableOpacity } from "react-native";
+import { Colors } from "react-native/Libraries/NewAppScreen";
+import Metrics from "../utils/metrics";
+import EDRTLText from "../components/EDRTLText";
 
-const PAGE_SIZE_PRODUCTS_LIST = 10;
+const PAGE_SIZE_PRODUCTS_LIST = 27;
 
 class ProductsListContainer extends React.Component {
   //#region STATE
   state = {
     isLoading: false,
     arrayProducts: undefined,
-    strSearchString: '',
+    strSearchString: "",
     isAddonsOpen: false,
     key: 1,
   };
@@ -51,8 +55,8 @@ class ProductsListContainer extends React.Component {
   /** CONSTRUCTOR */
   constructor(props) {
     super(props);
-    this.strOnScreenMessage = '';
-    this.strOnScreenSubtitle = '';
+    this.strOnScreenMessage = "";
+    this.strOnScreenSubtitle = "";
     this.shouldLoadMore = false;
     this.refreshing = false;
     this.listType =
@@ -70,7 +74,7 @@ class ProductsListContainer extends React.Component {
   }
 
   componentDidMount() {
-    debugLog('componentDidMount');
+    debugLog("componentDidMount");
     this.callProductsAPI();
   }
 
@@ -88,7 +92,7 @@ class ProductsListContainer extends React.Component {
     // this.strOnScreenMessage = ''
     // this.state.arrayProducts = undefined;
     // this.callProductsAPI()
-    this.setState({key: this.state.key + 1});
+    this.setState({ key: this.state.key + 1 });
     this.props.changeCartButtonVisibility({
       shouldShowFloatingButton: true,
       currentScreen: this.props,
@@ -138,18 +142,18 @@ class ProductsListContainer extends React.Component {
         saveCartData(
           this.props.cartDetail,
           () => {},
-          () => {},
+          () => {}
         );
       } else {
         showValidationAlert(
-          strings('generalNew.maxQuantity') + repeatArray.max_quantity,
+          strings("generalNew.maxQuantity") + repeatArray.max_quantity
         );
         this.setState({
           isAddonsOpen: false,
         });
       }
     } else {
-      showValidationAlert(strings('generalNew.noMoreStock'));
+      showValidationAlert(strings("generalNew.noMoreStock"));
       this.setState({
         isAddonsOpen: false,
       });
@@ -159,16 +163,16 @@ class ProductsListContainer extends React.Component {
   getScreenTitle = () => {
     if (this.listType == ProductsListType.category) {
       return this.entityFromHomeScreen !== undefined
-        ? this.entityFromHomeScreen.name || ''
-        : '';
+        ? this.entityFromHomeScreen.name || ""
+        : "";
     } else if (this.listType == ProductsListType.brands) {
       return this.entityFromHomeScreen !== undefined
-        ? this.entityFromHomeScreen.name || ''
-        : '';
+        ? this.entityFromHomeScreen.name || ""
+        : "";
     } else if (this.listType == ProductsListType.featuredProducts) {
-      return strings('homeNew.featured');
+      return strings("homeNew.featured");
     } else {
-      return strings('productsList.title');
+      return strings("productsList.title");
     }
   };
 
@@ -177,11 +181,12 @@ class ProductsListContainer extends React.Component {
     return (
       <BaseContainer
         title={this.getScreenTitle()}
-        left={'arrow-back'}
+        left={"arrow-back"}
         onLeft={this.buttonBackPressed}
-        right={'filter'}
+        right={"filter"}
         // right={Assets.ic_filter}
-        onRight={this.buttonFilterPressed}>
+        onRight={this.buttonFilterPressed}
+      >
         {/* TOAST */}
         <Toast ref="toast" position="center" fadeInDuration={1} />
 
@@ -191,38 +196,39 @@ class ProductsListContainer extends React.Component {
         <NavigationEvents onWillFocus={this.onWillFocusProductsListContainer} />
 
         <SearchBar
-          placeholder={strings('productsList.searchProducts')}
-          pointerEvents={this.state.isLoading ? 'none' : 'auto'}
+          placeholder={strings("productsList.searchProducts")}
+          pointerEvents={this.state.isLoading ? "none" : "auto"}
           onChangeText={this.searchTextDidChangeHandler}
           onClear={this.searchTextDidClearHandler}
           onBlur={this.onSearchFieldBlurHandler}
           value={this.state.strSearchString}
           lightTheme={true}
-          containerStyle={{backgroundColor: EDColors.offWhite}}
+          containerStyle={{ backgroundColor: EDColors.offWhite }}
           inputContainerStyle={{
             // borderColor: EDColors.shadow,
             borderWidth: 0.6,
-            borderBottomWidth : 0.6,
+            borderBottomWidth: 0.6,
             shadowOpacity: 1,
             shadowRadius: 5,
             shadowColor: EDColors.borderColor,
-            shadowOffset: {height: 10, width: 10},
+            shadowOffset: { height: 10, width: 10 },
             backgroundColor: EDColors.white,
-            flexDirection: isRTLCheck() ? 'row-reverse' : 'row',
+            flexDirection: isRTLCheck() ? "row-reverse" : "row",
           }}
           inputStyle={{
             color: EDColors.textAccount,
             fontFamily: EDFonts.bold,
-            fontWeight : '500',
+            fontWeight: "500",
             fontSize: getProportionalFontSize(14),
-            textAlign: isRTLCheck() ? 'right' : 'left',
+            textAlign: isRTLCheck() ? "right" : "left",
           }}
         />
 
         {/* PARENT VIEW */}
         <View
-          pointerEvents={this.state.isLoading ? 'none' : 'auto'}
-          style={styles.mainViewStyle}>
+          pointerEvents={this.state.isLoading ? "none" : "auto"}
+          style={styles.mainViewStyle}
+        >
           {/* SAFE AREA VIEW */}
           <SafeAreaView style={styles.mainViewStyle}>
             {/* LOADER */}
@@ -242,12 +248,39 @@ class ProductsListContainer extends React.Component {
                 extraData={this.state}
                 renderItem={this.renderProductItem}
                 keyExtractor={(item, index) => item + index}
-                onEndReached={this.onLoadMoreEventHandler}
-                onEndReachedThreshold={0.5}
+                // onEndReached={this.onLoadMoreEventHandler}
+                // onEndReachedThreshold={0.5}
+                ListFooterComponent={() => {
+                  return (
+                    this.shouldLoadMore && (
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: EDColors.homeButtonColor,
+                          borderRadius: 4,
+                          height: 40,
+                          width: Metrics.screenWidth * 0.28,
+                          alignSelf: "center",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                        onPress={() => this.onLoadMoreEventHandler()}
+                      >
+                        <EDRTLText
+                          style={{
+                            fontSize: getProportionalFontSize(11),
+                            fontFamily: EDFonts.medium,
+                            color: EDColors.white,
+                          }}
+                          title={"Load More Data"}
+                        />
+                      </TouchableOpacity>
+                    )
+                  );
+                }}
                 refreshControl={
                   <RefreshControl
                     refreshing={this.refreshing}
-                    title={strings('productsList.fetchingNew')}
+                    title={strings("productsList.fetchingNew")}
                     titleColor={EDColors.textAccount}
                     tintColor={EDColors.textAccount}
                     colors={[EDColors.textAccount]}
@@ -257,7 +290,7 @@ class ProductsListContainer extends React.Component {
               />
             ) : this.strOnScreenMessage.length > 0 ? (
               <EDPlaceholderComponent
-                buttonTitle={strings('buttonTitles.okay')}
+                buttonTitle={strings("buttonTitles.okay")}
                 onBrowseButtonHandler={this.buttonBrowsePressed}
                 title={this.strOnScreenMessage}
                 subTitle={this.strOnScreenSubtitle}
@@ -273,18 +306,18 @@ class ProductsListContainer extends React.Component {
   //#region HELPER METHODS
   /** SEARCH TEXT CHANGE HANDLER */
   searchTextDidChangeHandler = (searchText) => {
-    this.setState({strSearchString: searchText});
+    this.setState({ strSearchString: searchText });
   };
 
   searchTextDidClearHandler = () => {
-    this.state.strSearchString = '';
-    this.setState({strSearchString: ''});
+    this.state.strSearchString = "";
+    this.setState({ strSearchString: "" });
     this.onSearchFieldBlurHandler();
   };
 
   onSearchFieldBlurHandler = () => {
-    this.strOnScreenMessage = '';
-    this.strOnScreenSubtitle = '';
+    this.strOnScreenMessage = "";
+    this.strOnScreenSubtitle = "";
     this.refreshing = false;
     this.shouldLoadMore = false;
     this.state.arrayProducts = undefined;
@@ -317,8 +350,8 @@ class ProductsListContainer extends React.Component {
         currencySymbol={this.props.currencySymbol}
         isOpen={
           (
-            (this.props.objStoreDetails.timings || {}).closing || ''
-          ).toLowerCase() == 'open'
+            (this.props.objStoreDetails.timings || {}).closing || ""
+          ).toLowerCase() == "open"
             ? true
             : false
         }
@@ -336,10 +369,10 @@ class ProductsListContainer extends React.Component {
     this.refreshing = false;
     this.shouldLoadMore = false;
     this.state.arrayProducts = undefined;
-    this.strOnScreenMessage = '';
-    this.strOnScreenSubtitle = '';
+    this.strOnScreenMessage = "";
+    this.strOnScreenSubtitle = "";
     // this.setState({ arrayProducts: undefined })
-    debugLog('PTR');
+    debugLog("PTR");
     this.callProductsAPI(true);
   };
   //#endregion
@@ -352,7 +385,7 @@ class ProductsListContainer extends React.Component {
 
   /** FILTER BUTTON EVENT */
   buttonFilterPressed = () => {
-    this.props.navigation.navigate('productsFilter', {
+    this.props.navigation.navigate("productsFilter", {
       isFilterSelection: this.listType,
       onApplyResetHandler: this.onFilterCallback,
     });
@@ -362,12 +395,12 @@ class ProductsListContainer extends React.Component {
   buttonAddQuantityPressed = (productSelected) => {
     this.objSelectedCustomisableProduct = productSelected;
     this.objLastSelectedProduct = productSelected;
-    this.setState({isAddonsOpen: true});
+    this.setState({ isAddonsOpen: true });
   };
 
   /** MINUS - BUTTON HANDLER */
   buttonRemoveQuantityPressed = (value) => {
-    this.props.navigation.navigate('cart', {
+    this.props.navigation.navigate("cart", {
       isview: value,
     });
   };
@@ -376,8 +409,8 @@ class ProductsListContainer extends React.Component {
   };
   /** PLUS + BUTTON HANDLER */
   buttonCustomiseProductPressed = (productSelected) => {
-    this.setState({isAddonsOpen: false});
-    this.props.navigation.navigate('addOns', {
+    this.setState({ isAddonsOpen: false });
+    this.props.navigation.navigate("addOns", {
       getCategoryDetails: this.onAddOnsItemSelectionHandler,
       subCategoryArray: productSelected,
     });
@@ -390,7 +423,7 @@ class ProductsListContainer extends React.Component {
       this.props.cartDetail.items !== undefined &&
       this.props.cartDetail.length !== 0
     ) {
-      console.log('PRODUCT ADDDD : ', productToAdd);
+      console.log("PRODUCT ADDDD : ", productToAdd);
       let cartData = this.props.cartDetail.items;
       let arr = cartData.filter((p) => {
         return p.menu_id == productToAdd.menu_id;
@@ -401,22 +434,26 @@ class ProductsListContainer extends React.Component {
           productToAdd.item_in_stock !== 0 &&
           productToAdd.item_in_stock > arr[0].quantity
         ) {
-          console.log('Array Quntity :: ' + arr[0].quantity + ' ' +productToAdd.item_max_quantity);
+          console.log(
+            "Array Quntity :: " +
+              arr[0].quantity +
+              " " +
+              productToAdd.item_max_quantity
+          );
           if (productToAdd.item_max_quantity > arr[0].quantity)
             this.storeData(productToAdd);
           else
             showValidationAlert(
-              strings('generalNew.maxQuantity') +
-                productToAdd.item_max_quantity,
+              strings("generalNew.maxQuantity") + productToAdd.item_max_quantity
             );
-        } else showValidationAlert(strings('generalNew.noMoreStock'));
+        } else showValidationAlert(strings("generalNew.noMoreStock"));
       } else {
         if (
           productToAdd.item_in_stock !== null &&
           productToAdd.item_in_stock !== 0
         )
           this.storeData(productToAdd);
-        else showValidationAlert(strings('generalNew.noMoreStock'));
+        else showValidationAlert(strings("generalNew.noMoreStock"));
       }
     } else this.storeData(productToAdd);
   };
@@ -428,8 +465,8 @@ class ProductsListContainer extends React.Component {
 
   //#region HELPER METHODS
   onFilterCallback = () => {
-    this.strOnScreenMessage = '';
-    this.strOnScreenSubtitle = '';
+    this.strOnScreenMessage = "";
+    this.strOnScreenSubtitle = "";
     this.state.arrayProducts = undefined;
     this.shouldLoadMore = false;
     this.callProductsAPI();
@@ -453,12 +490,12 @@ class ProductsListContainer extends React.Component {
           .map((item) => item[0].addons_list);
         if (
           repeatArray.includes(
-            data.selected_addons_category_list[0].addons_category_id,
+            data.selected_addons_category_list[0].addons_category_id
           )
         ) {
           let arr = cartArray.map((data) => data[0].add_ons_id);
           let index = arr.indexOf(
-            data.selected_addons_category_list[0].addons_list[0].add_ons_id,
+            data.selected_addons_category_list[0].addons_list[0].add_ons_id
           );
           // let index = cartArray.indexOf(data.selected_addons_category_list[0].addons_category_id)
           if (
@@ -481,20 +518,20 @@ class ProductsListContainer extends React.Component {
               saveCartData(
                 this.props.cartDetail,
                 () => {},
-                () => {},
+                () => {}
               );
             } else {
               showValidationAlert(
-                strings('generalNew.maxQuantity') +
+                strings("generalNew.maxQuantity") +
                   this.selectedArray[index].addons_category_list[0]
-                    .addons_list[0].max_quantity,
+                    .addons_list[0].max_quantity
               );
               this.setState({
                 isAddonsCategoryOpen: false,
               });
             }
           } else {
-            showValidationAlert(strings('generalNew.noMoreStock'));
+            showValidationAlert(strings("generalNew.noMoreStock"));
             this.setState({
               isAddonsCategoryOpen: false,
             });
@@ -508,21 +545,21 @@ class ProductsListContainer extends React.Component {
     var arrCartItems = [];
 
     const objectWithoutKey = (object, key) => {
-      const {[key]: deletedKey, ...otherKeys} = object;
+      const { [key]: deletedKey, ...otherKeys } = object;
       return otherKeys;
     };
-    var Category_data = objectWithoutKey(data, 'addons_category_list');
+    var Category_data = objectWithoutKey(data, "addons_category_list");
 
-    if (Category_data.is_customize === '1') {
-      Category_data['addons_category_list'] =
-        Category_data['selected_addons_category_list'];
-      delete Category_data['selected_addons_category_list'];
+    if (Category_data.is_customize === "1") {
+      Category_data["addons_category_list"] =
+        Category_data["selected_addons_category_list"];
+      delete Category_data["selected_addons_category_list"];
     }
 
     let cartdata = this.props.cartDetail;
     if (
       cartdata != undefined &&
-      cartdata.items != '' &&
+      cartdata.items != "" &&
       cartdata.items != null &&
       cartdata.items != undefined
     ) {
@@ -544,39 +581,39 @@ class ProductsListContainer extends React.Component {
         }
 
         this.cartData = {
-          store_id: this.props.objStoreDetails.store_id || '0',
+          store_id: this.props.objStoreDetails.store_id || "0",
           items: arrCartItems,
           coupon_name:
-            cartdata.coupon_name.length > 0 ? cartdata.coupon_name : '',
+            cartdata.coupon_name.length > 0 ? cartdata.coupon_name : "",
           cart_id: cartdata.cart_id,
         };
       } else {
         Category_data.quantity = 1;
         this.cartData = {
-          store_id: this.props.objStoreDetails.store_id || '0',
+          store_id: this.props.objStoreDetails.store_id || "0",
           items: [Category_data],
-          coupon_name: '',
+          coupon_name: "",
           cart_id: 0,
         };
       }
     } else {
       Category_data.quantity = 1;
       this.cartData = {
-        store_id: this.props.objStoreDetails.store_id || '0',
+        store_id: this.props.objStoreDetails.store_id || "0",
         items: [Category_data],
-        coupon_name: '',
+        coupon_name: "",
         cart_id: 0,
       };
     }
-    this.refs.toast.show(strings('generalNew.itemAddedSuccessfully'), 1000);
+    this.refs.toast.show(strings("generalNew.itemAddedSuccessfully"), 1000);
     this.props.saveCartDataInRedux(this.cartData);
     saveCartData(
       this.cartData,
       () => {},
-      () => {},
+      () => {}
     );
     this.getCartCount(this.cartData);
-    this.setState({key: this.state.key + 1});
+    this.setState({ key: this.state.key + 1 });
   };
 
   // #cart Item's Total count
@@ -603,8 +640,8 @@ class ProductsListContainer extends React.Component {
    * @param {The success response object} objSuccess
    */
   onGetProductsSuccess = (objSuccess) => {
-    this.strOnScreenMessage = strings('productsList.noProductsTitle');
-    this.strOnScreenSubtitle = strings('productsList.noProductsMessage');
+    this.strOnScreenMessage = strings("productsList.noProductsTitle");
+    this.strOnScreenSubtitle = strings("productsList.noProductsMessage");
     this.refreshing = false;
 
     if (this.state.arrayProducts === undefined) {
@@ -626,7 +663,7 @@ class ProductsListContainer extends React.Component {
         isLoading: false,
       });
     } else {
-      this.setState({isLoading: false});
+      this.setState({ isLoading: false });
     }
     this.refreshing = false;
   };
@@ -638,9 +675,9 @@ class ProductsListContainer extends React.Component {
   onGetProductsFailure = (objFailure) => {
     this.refreshing = false;
 
-    this.strOnScreenSubtitle = '';
-    this.strOnScreenMessage = objFailure.message || '';
-    this.setState({isLoading: false});
+    this.strOnScreenSubtitle = "";
+    this.strOnScreenMessage = objFailure.message || "";
+    this.setState({ isLoading: false });
     this.refreshing = false;
   };
 
@@ -662,22 +699,22 @@ class ProductsListContainer extends React.Component {
       return;
     }
 
-    this.strOnScreenMessage = '';
-    this.strOnScreenSubtitle = '';
+    this.strOnScreenMessage = "";
+    this.strOnScreenSubtitle = "";
     var strSelectedBrandIDs = this.props.objFilter.arraySelectedBrandIDs.join();
     var strSelectedCategoryIDs =
       this.props.objFilter.arraySelectedCategoryIDs.join();
 
     netStatus((isConnected) => {
       if (isConnected) {
-        console.log('CHECKLISTING ::::::::: ', this.props.objStoreDetails);
+        console.log("CHECKLISTING ::::::::: ", this.props.objStoreDetails);
         console.log(
-          'strSelectedCategoryIDs ::::::::: ',
+          "strSelectedCategoryIDs ::::::::: ",
           strSelectedCategoryIDs,
-          strSelectedBrandIDs,
+          strSelectedBrandIDs
         );
         this.refreshing = true;
-        this.setState({isLoading: true});
+        this.setState({ isLoading: true });
         let objGetProductsParams = {
           store_id: this.props.objStoreDetails.store_id,
           brand_id: strSelectedBrandIDs,
@@ -692,30 +729,30 @@ class ProductsListContainer extends React.Component {
           page_no:
             this.state.arrayProducts && !isForRefresh
               ? parseInt(
-                  this.state.arrayProducts.length / PAGE_SIZE_PRODUCTS_LIST,
+                  this.state.arrayProducts.length / PAGE_SIZE_PRODUCTS_LIST
                 ) + 1
               : 1,
           count: PAGE_SIZE_PRODUCTS_LIST,
           search_string: this.state.strSearchString,
         };
         if (!isForRefresh) {
-          this.setState({isLoading: this.state.arrayProducts === undefined});
+          this.setState({ isLoading: this.state.arrayProducts === undefined });
         }
         getProducts(
           objGetProductsParams,
           this.onGetProductsSuccess,
           this.onGetProductsFailure,
-          this.props,
+          this.props
         );
       } else {
         this.refreshing = false;
         if (this.state.arrayProducts === undefined) {
-          this.strOnScreenMessage = strings('generalNew.noInternetTitle');
-          this.strOnScreenSubtitle = strings('generalNew.noInternet');
-          this.setState({arrayProducts: []});
+          this.strOnScreenMessage = strings("generalNew.noInternetTitle");
+          this.strOnScreenSubtitle = strings("generalNew.noInternet");
+          this.setState({ arrayProducts: [] });
         } else {
-          this.strOnScreenMessage = '';
-          this.strOnScreenSubtitle = '';
+          this.strOnScreenMessage = "";
+          this.strOnScreenSubtitle = "";
         }
       }
     });
@@ -723,7 +760,7 @@ class ProductsListContainer extends React.Component {
 
   /** NAVIGATE TO DETAIL SCREEN */
   navigateToProductDetail = (data) => {
-    this.props.navigation.navigate('prodcutDetails', {
+    this.props.navigation.navigate("prodcutDetails", {
       selectedProductDetails: data,
     });
   };
@@ -740,7 +777,7 @@ const styles = StyleSheet.create({
   },
   addOnsStyle: {
     flex: 1,
-    justifyContent: 'flex-end',
+    justifyContent: "flex-end",
   },
 });
 //#endregion
@@ -776,6 +813,6 @@ export default connect(
         dispatch(saveCartDataInRedux(data));
       },
     };
-  },
+  }
 )(ProductsListContainer);
 //#endregion
