@@ -38,7 +38,7 @@ import Metrics from "../utils/metrics";
 import EDRTLText from "../components/EDRTLText";
 import usePagination from "../components/PaginationHook";
 
-const PAGE_SIZE_PRODUCTS_LIST = 9;
+const PAGE_SIZE_PRODUCTS_LIST = 27;
 
 class ProductsListContainer extends React.Component {
   //#region STATE
