@@ -36,17 +36,19 @@ import { TouchableOpacity } from "react-native";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import Metrics from "../utils/metrics";
 import EDRTLText from "../components/EDRTLText";
+import usePagination from "../components/PaginationHook";
 
-const PAGE_SIZE_PRODUCTS_LIST = 27;
+const PAGE_SIZE_PRODUCTS_LIST = 9;
 
 class ProductsListContainer extends React.Component {
   //#region STATE
   state = {
     isLoading: false,
-    arrayProducts: undefined,
+    arrayProducts: [],
     strSearchString: "",
     isAddonsOpen: false,
     key: 1,
+    pageNumber: 0,
   };
   //#endregion
 
@@ -244,7 +246,7 @@ class ProductsListContainer extends React.Component {
                 }}
                 numColumns={3}
                 style={[styles.productsList]}
-                data={this.state.arrayProducts}
+                data={this.usePagination().pageData()}
                 extraData={this.state}
                 renderItem={this.renderProductItem}
                 keyExtractor={(item, index) => item + index}
@@ -252,29 +254,67 @@ class ProductsListContainer extends React.Component {
                 // onEndReachedThreshold={0.5}
                 ListFooterComponent={() => {
                   return (
-                    this.shouldLoadMore && (
-                      <TouchableOpacity
-                        style={{
-                          backgroundColor: EDColors.homeButtonColor,
-                          borderRadius: 4,
-                          height: 40,
-                          width: Metrics.screenWidth * 0.28,
-                          alignSelf: "center",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                        onPress={() => this.onLoadMoreEventHandler()}
-                      >
-                        <EDRTLText
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        marginHorizontal: 10,
+                        marginVertical: 10,
+                      }}
+                    >
+                      {this.usePagination().pageOfNumber != 0 ? (
+                        <TouchableOpacity
                           style={{
-                            fontSize: getProportionalFontSize(11),
-                            fontFamily: EDFonts.medium,
-                            color: EDColors.white,
+                            backgroundColor: EDColors.homeButtonColor,
+                            borderRadius: 4,
+                            height: 40,
+                            width: Metrics.screenWidth * 0.28,
+                            alignSelf: "center",
+                            alignItems: "center",
+                            justifyContent: "center",
                           }}
-                          title={"Load More Data"}
-                        />
-                      </TouchableOpacity>
-                    )
+                          onPress={() => this.usePagination().previousPage()}
+                        >
+                          <EDRTLText
+                            style={{
+                              fontSize: getProportionalFontSize(11),
+                              fontFamily: EDFonts.medium,
+                              color: EDColors.white,
+                            }}
+                            title={"Previous"}
+                          />
+                        </TouchableOpacity>
+                      ) : (
+                        <View />
+                      )}
+                      {this.usePagination().pageOfNumber !=
+                      this.usePagination().pageCount - 1 ? (
+                        <TouchableOpacity
+                          style={{
+                            backgroundColor: EDColors.homeButtonColor,
+                            borderRadius: 4,
+                            height: 40,
+                            width: Metrics.screenWidth * 0.28,
+                            alignSelf: "center",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                          onPress={() => this.usePagination().nextPage()}
+                        >
+                          <EDRTLText
+                            style={{
+                              fontSize: getProportionalFontSize(11),
+                              fontFamily: EDFonts.medium,
+                              color: EDColors.white,
+                            }}
+                            title={"Next"}
+                          />
+                        </TouchableOpacity>
+                      ) : (
+                        <View />
+                      )}
+                    </View>
                   );
                 }}
                 refreshControl={
@@ -330,6 +370,46 @@ class ProductsListContainer extends React.Component {
       this.callProductsAPI();
     }
   };
+
+  usePagination() {
+    let pageOfNumber = this.state.pageNumber;
+    console.log("PAGE : ", pageOfNumber);
+    const pageCount = Math.ceil(
+      this.state.arrayProducts.length / PAGE_SIZE_PRODUCTS_LIST
+    );
+    const changePage = (pN) => {
+      this.setState({
+        pageNumber: pN,
+      });
+    };
+
+    const pageData = () => {
+      const s = pageOfNumber * PAGE_SIZE_PRODUCTS_LIST;
+      const e = s + PAGE_SIZE_PRODUCTS_LIST;
+      return this.state.arrayProducts.slice(s, e);
+    };
+
+    const nextPage = () => {
+      this.setState({
+        pageNumber: Math.min(pageOfNumber + 1, pageCount - 1),
+      });
+    };
+
+    const previousPage = () => {
+      this.setState({
+        pageNumber: Math.max(pageOfNumber - 1, 0),
+      });
+    };
+
+    return {
+      pageOfNumber,
+      pageCount,
+      changePage,
+      pageData,
+      nextPage,
+      previousPage,
+    };
+  }
 
   /** PRODUCT ITEM */
   renderProductItem = (productToLoad) => {
@@ -653,13 +733,14 @@ class ProductsListContainer extends React.Component {
       objSuccess.data.product_list instanceof Array &&
       objSuccess.data.product_list.length > 0
     ) {
-      let arrProducts = objSuccess.data.product_list || [];
-      let totalProductsCount = objSuccess.data.product_count || 0;
-      this.shouldLoadMore =
-        this.state.arrayProducts.length + arrProducts.length <
-        totalProductsCount;
+      // let arrProducts = objSuccess.data.product_list || [];
+      // let totalProductsCount = objSuccess.data.product_count || 0;
+      // this.shouldLoadMore =
+      //   this.state.arrayProducts.length + arrProducts.length <
+      //   totalProductsCount;
       this.setState({
-        arrayProducts: [...this.state.arrayProducts, ...arrProducts],
+        // arrayProducts: [...this.state.arrayProducts, ...arrProducts],
+        arrayProducts: objSuccess.data.product_list,
         isLoading: false,
       });
     } else {
@@ -726,13 +807,13 @@ class ProductsListContainer extends React.Component {
             : 0,
           isFeatured: this.props.objFilter.shouldShowFeaturedProducts ? 1 : 0,
           language_slug: this.props.lan,
-          page_no:
-            this.state.arrayProducts && !isForRefresh
-              ? parseInt(
-                  this.state.arrayProducts.length / PAGE_SIZE_PRODUCTS_LIST
-                ) + 1
-              : 1,
-          count: PAGE_SIZE_PRODUCTS_LIST,
+          // page_no:
+          //   this.state.arrayProducts && !isForRefresh
+          //     ? parseInt(
+          //         this.state.arrayProducts.length / PAGE_SIZE_PRODUCTS_LIST
+          //       ) + 1
+          //     : 1,
+          // count: PAGE_SIZE_PRODUCTS_LIST,
           search_string: this.state.strSearchString,
         };
         if (!isForRefresh) {
